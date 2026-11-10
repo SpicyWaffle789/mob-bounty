@@ -4,3 +4,14 @@ main: com.example.mobbounty.MobBounty
 api-version: '1.20'
 depend: [Vault]
 description: Rewards players with currency upon killing mobs.
+
+commands:
+  mobbounty:
+    description: MobBounty admin command
+    usage: /<command> reload
+    permission: mobbounty.reload
+
+permissions:
+  mobbounty.reload:
+    description: Allows reloading the MobBounty config
+    default: op
