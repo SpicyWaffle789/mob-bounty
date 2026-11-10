@@ -2,8 +2,6 @@ package com.example.mobbounty;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -19,12 +17,16 @@ public final class MobBounty extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        // Save default config.yml if non-existent
+        saveDefaultConfig();
+
         if (!setupEconomy()) {
             getLogger().severe("Vault or an Economy plugin was not found! Disabling plugin.");
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        getServer().getPluginManager().registerEvents(this, getServer().getPluginManager().isPluginEnabled(this) ? this : null);
+
+        getServer().getPluginManager().registerEvents(this, this);
         getLogger().info("MobBounty has been enabled!");
     }
 
@@ -45,29 +47,31 @@ public final class MobBounty extends JavaPlugin implements Listener {
         LivingEntity entity = event.getEntity();
         Player killer = entity.getKiller();
 
-        // Check if killed by a player
         if (killer == null) {
             return;
         }
 
-        double reward = 0.0;
+        double reward;
 
-        // Ender Dragon
         if (entity.getType() == EntityType.ENDER_DRAGON) {
-            reward = 10000.00;
-        } 
-        // Boss mobs (Wither, Warden, Elder Guardian)
-        else if (isBossMob(entity.getType())) {
-            reward = 50.00;
-        } 
-        // Regular mobs
-        else {
-            reward = 0.50;
+            reward = getConfig().getDouble("rewards.ender-dragon", 10000.00);
+        } else if (isBossMob(entity.getType())) {
+            reward = getConfig().getDouble("rewards.boss", 50.00);
+        } else {
+            reward = getConfig().getDouble("rewards.default", 0.50);
         }
 
         if (reward > 0) {
             econ.depositPlayer(killer, reward);
-            killer.sendMessage(ChatColor.GREEN + "+$" + String.format("%.2f", reward) + " for killing a " + formatName(entity.getType()));
+            
+            String formattedAmount = String.format("%.2f", reward);
+            String messageTemplate = getConfig().getString("messages.kill-reward", "&a+$%amount% for killing a %mob%!");
+            
+            String message = messageTemplate
+                    .replace("%amount%", formattedAmount)
+                    .replace("%mob%", formatName(entity.getType()));
+
+            killer.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         }
     }
 
