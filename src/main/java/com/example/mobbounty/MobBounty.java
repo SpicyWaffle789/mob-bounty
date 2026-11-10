@@ -2,6 +2,7 @@ package com.example.mobbounty;
 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -20,14 +21,18 @@ public final class MobBounty extends JavaPlugin implements Listener {
         // Save default config.yml if non-existent
         saveDefaultConfig();
 
-        if (!setupEconomy()) {
-            getLogger().severe("Vault or an Economy plugin was not found! Disabling plugin.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-
-        getServer().getPluginManager().registerEvents(this, this);
-        getLogger().info("MobBounty has been enabled!");
+        // Defer the economy lookup until every plugin has finished enabling.
+        // Economy providers (EssentialsX, etc.) may register their service after
+        // this plugin's onEnable runs, which would make the lookup fail.
+        getServer().getScheduler().runTask(this, () -> {
+            if (!setupEconomy()) {
+                getLogger().severe("Vault or an Economy plugin was not found! Disabling plugin.");
+                getServer().getPluginManager().disablePlugin(this);
+                return;
+            }
+            getServer().getPluginManager().registerEvents(this, this);
+            getLogger().info("MobBounty has been enabled!");
+        });
     }
 
     private boolean setupEconomy() {
@@ -47,7 +52,7 @@ public final class MobBounty extends JavaPlugin implements Listener {
         LivingEntity entity = event.getEntity();
         Player killer = entity.getKiller();
 
-        if (killer == null) {
+        if (killer == null || entity instanceof Player || entity instanceof ArmorStand) {
             return;
         }
 
