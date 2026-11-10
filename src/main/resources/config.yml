@@ -1,0 +1,9 @@
+# MobBounty Configuration
+
+rewards:
+  default: 0.50
+  boss: 50.00
+  ender-dragon: 10000.00
+
+messages:
+  kill-reward: "&a+$%amount% for killing a %mob%!"
