@@ -1,9 +1,22 @@
 # MobBounty Configuration
 
 rewards:
+  # Paid for any mob not listed below
   default: 0.50
+  # Paid for Wither, Warden and Elder Guardian
   boss: 50.00
   ender-dragon: 10000.00
 
+  # Per-mob overrides. These take priority over everything above.
+  # Use the Bukkit EntityType name (UPPERCASE, underscores): ENDERMAN, ZOMBIE,
+  # WITHER_SKELETON, IRON_GOLEM, etc.
+  # Set a mob to 0 to give no reward for it.
+  mobs:
+   # ENDERMAN: 1.0
+   # ZOMBIE: 0.75
+   # CREEPER: 1.25
+
 messages:
   kill-reward: "&a+$%amount% for killing a %mob%!"
+  reloaded: "&aMobBounty config reloaded."
+  no-permission: "&cYou don't have permission to do that."
