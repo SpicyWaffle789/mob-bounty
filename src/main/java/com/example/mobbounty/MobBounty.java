@@ -1,5 +1,5 @@
 package com.example.mobbounty;
-
+ 
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
